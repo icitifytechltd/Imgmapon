@@ -1,20 +1,27 @@
-### 📄 Updated `README.md`
-
 ````markdown
-# IMG MAPON
+# IMG MAPON v2 - Advanced Image Forensics Tool
 
-**IMG MAPON** is a powerful image intelligence tool developed by **ICITIFY TECH**.  
-It extracts metadata, detects objects, finds dominant colors, edges, and performs OCR from images or image URLs. Additionally, it offers advanced features for deep image research and easy lookups.
+**Author:** ICITIFY TECH  
+**Email:** info@icitifytech.com  
+
+IMG MAPON is an advanced image forensics tool designed for deep image analysis, including metadata extraction, object detection, OCR, color analysis, and more. It supports both local images and images from URLs.
+
+---
 
 ## Features
 
-- Extract image metadata (format, size, mode)
-- Detect dominant colors in an image
-- Perform edge detection
-- Extract text using OCR
-- Object detection (placeholder for YOLO/TensorFlow)
-- Reverse image search using AI-powered tools
-- Deep research capabilities for comprehensive analysis
+- Extract **image metadata** (EXIF info, GPS coordinates, camera model, etc.)  
+- Convert **GPS data to human-readable location**  
+- Detect **dominant colors** in the image  
+- Perform **edge detection** for image analysis  
+- Extract **text using OCR**  
+- Detect **objects** (YOLO-based placeholder detection included)  
+- Support for **reverse image search** (planned)  
+- Support for **deep research / AI integration** (planned)  
+- Works with **local images** or **downloaded from URL**  
+- Outputs results in a **JSON file** for easy processing  
+
+---
 
 ## Installation
 
@@ -22,95 +29,113 @@ It extracts metadata, detects objects, finds dominant colors, edges, and perform
 
 ```bash
 git clone https://github.com/icitifytechltd/Imgmapon.git
-cd Imgmapon
+cd imgmapon
 ````
 
 2. Create a virtual environment (recommended):
 
 ```bash
-python3 -m venv venv
-source venv/bin/activate
+python -m venv venv
+source venv/bin/activate  # Linux / Mac
+venv\Scripts\activate     # Windows
 ```
 
 3. Install dependencies:
 
 ```bash
-sudo apt update
-sudo apt install -y python3-pip tesseract-ocr libtesseract-dev
 pip install -r requirements.txt
 ```
 
+---
+
 ## Usage
 
-Run the main script:
-
-```bash
-python imgmapon_main.py --help
-```
-
-### Available Commands
-
-| Command          | Description                        |
-| ---------------- | ---------------------------------- |
-| `--image <path>` | Analyze a local image file         |
-| `--url <url>`    | Analyze an image from a URL        |
-| `--metadata`     | Extract image metadata             |
-| `--colors`       | Detect dominant colors             |
-| `--edges`        | Perform edge detection             |
-| `--text`         | Extract text from image using OCR  |
-| `--objects`      | Detect objects in the image        |
-| `--search`       | Perform reverse image search       |
-| `--research`     | Conduct deep research on the image |
-
-### Examples
+### Basic usage:
 
 Analyze a local image:
 
 ```bash
-python imgmapon_main.py --image example.jpg --metadata --colors --edges --text --objects --search --research
+python main.py --image path/to/image.jpg --metadata --colors --edges --text --objects
 ```
 
 Analyze an image from a URL:
 
 ```bash
-python imgmapon_main.py --url https://example.com/image.jpg --metadata --colors --edges --text --objects --search --research
+python main.py --url https://example.com/image.jpg --metadata --colors --edges
 ```
 
-This will output:
+### Options
 
-* Metadata (format, size, mode)
-* Dominant colors
-* Edge detection image (saved locally)
-* Extracted text
-* Detected objects
-* Reverse image search results
-* Deep research findings
+| Argument     | Description                                       |
+| ------------ | ------------------------------------------------- |
+| `--image`    | Path to the local image file                      |
+| `--url`      | URL of the image                                  |
+| `--metadata` | Extract metadata (EXIF, GPS, camera)              |
+| `--colors`   | Detect dominant colors                            |
+| `--edges`    | Perform edge detection                            |
+| `--text`     | Extract text using OCR                            |
+| `--objects`  | Detect objects in the image                       |
+| `--search`   | Perform reverse image search (coming soon)        |
+| `--research` | Conduct deep research / AI analysis (coming soon) |
 
-## Requirements
+### Example Command:
 
-* Python 3.13+
-* pip packages (see `requirements.txt`)
-* Tesseract OCR
+```bash
+python main.py --image test_image.jpg --metadata --colors --edges --text --objects
+```
 
-## License
+After running, results are saved in:
 
-**IMG MAPON** is proprietary software.
-
-Copyright (c) 2025 **ICITIFY TECH**
-Email: [info@icitifytech.com](mailto:info@icitifytech.com)
-
-All rights reserved. You may use this software for personal or internal purposes only. Redistribution, selling, or claiming ownership of IMG MAPON or its derivative works is prohibited without explicit permission from ICITIFY TECH.
-
-## Author
-
-**ICITIFY TECH**
-Email: [info@icitifytech.com](mailto:info@icitifytech.com)
-
+```
+imgmapon_results.json
 ```
 
 ---
 
-By implementing these enhancements, **IMG MAPON** will become a more robust tool for deep image research and easy lookups, providing users with comprehensive insights and analysis capabilities. If you need assistance with integrating these features into your existing codebase or have any questions, feel free to ask!
-::contentReference[oaicite:21]{index=21}
- 
+## Output Example
+
+```json
+{
+  "metadata": {
+    "format": "JPEG",
+    "mode": "RGB",
+    "size": [1024, 768],
+    "gps": {
+      "GPSLatitude": 40.7128,
+      "GPSLongitude": -74.0060
+    }
+  },
+  "gps_location": "New York, NY, USA",
+  "dominant_colors": [
+    [77, 80, 84],
+    [189, 183, 183],
+    [122, 60, 52]
+  ],
+  "edges": [[255, 0, 255, ...]],
+  "text": "Sample text extracted from image",
+  "objects": ["person", "dog"],
+  "source": "local",
+  "image_path": "test_image.jpg"
+}
+```
+
+---
+
+## License
+
+This project is licensed under the **MIT License**.
+See `LICENSE` for details.
+
+---
+
+## Notes
+
+* Ensure **Tesseract OCR** is installed and accessible for text extraction.
+* For GPS location, **geopy** uses OpenStreetMap Nominatim API, which requires an internet connection.
+* Object detection is currently a placeholder; integrate **YOLOv5** or similar models for full functionality.
+
+---
+
+**ICITIFY TECH** – Secure, deep, and intelligent image analysis.
+
 ```

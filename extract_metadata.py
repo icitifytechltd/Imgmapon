@@ -1,14 +1,17 @@
 from PIL import Image
-import exifread
+from PIL.ExifTags import TAGS
 
 
-def extract_exif(file_path):
-    with open(file_path, "rb") as f:
-        tags = exifread.process_file(f, details=False)
-    data = {}
-    for tag in tags.keys():
-        data[tag] = str(tags[tag])
-    return data
+def extract_metadata(image_path):
+    """Extract metadata from an image file."""
+    image = Image.open(image_path)
+    info = image._getexif()
+    metadata = {}
+    if info is not None:
+        for tag, value in info.items():
+            tag_name = TAGS.get(tag, tag)
+            metadata[tag_name] = value
+    return metadata
 
 
 def gps_from_exif(exif_data):
