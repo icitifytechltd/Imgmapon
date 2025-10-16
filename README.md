@@ -1,12 +1,33 @@
-Here’s an updated version of your README to reflect the **new features in v2**, including the automatic update functionality, better object detection, host IP detection, and enhanced usage instructions for end users:
-
-````markdown
+```markdown
 # IMG MAPON v2 - Advanced Image Forensics & Deep Image Analysis Tool
 
 **Author:** ICITIFY TECH  
 **Email:** info@icitifytech.com  
 
 IMG MAPON v2 is a production-ready image forensics tool designed for **deep image analysis**. It provides metadata extraction, GPS location lookup, object detection, OCR, color analysis, edge detection, host IP detection, and more. It supports both **local images** and **images from URLs** and now includes a tool update feature to easily get the latest version.
+
+---
+
+## IMGMAPON Banner
+
+When you execute `main.py`, you'll see a big welcome ASCII banner like this:
+
+```
+
+██╗███╗   ███╗ ████╗   ████╗ ████╗   ███╗ ████╗ ██████╗ ██╗███╗   ██╗
+██║████╗ ████║ ██╔██╗ ██╔██╗ ████║ ██╔██╗ ██╔██╗ ██╔══██╗██║████╗  ██║
+██║██╔████╔██║ ██║╚██╗██║╚██╗██╔██║ ██║╚██╗██║╚██╗██║  ██║██║██╔██╗ ██║
+██║██║╚██╔╝██║ ██║ ╚███║ ╚███║██║ ██║ ██║ ╚███║ ╚██║  ██║██║██║╚██╗██║
+██║██║ ╚═╝ ██║ ██║  ╚══╝  ╚══╝██║ ██║ ██║  ╚══╝  ╚██████╔╝██║██║ ╚████║
+╚═╝╚═╝     ╚═╝ ╚═╝         ╚═╝╚═╝ ╚═╝ ╚═╝         ╚═════╝ ╚═╝╚═╝  ╚═══╝
+
+```
+         ICITIFY TECH - IMGMAPON v2.0
+```
+
+````
+
+This makes the tool more visually appealing and gives a **professional production feel**.
 
 ---
 
@@ -73,7 +94,7 @@ python main.py --url https://example.com/image.jpg --metadata --colors --edges
 python update_tool.py
 ```
 
-This will automatically download the latest versions of `main.py`, `analyze_content.py`, and `utils.py`.
+This automatically updates `main.py`, `analyze_content.py`, and `utils.py`.
 
 ### Available Options:
 
@@ -95,7 +116,7 @@ This will automatically download the latest versions of `main.py`, `analyze_cont
 python main.py --image test_image.jpg --metadata --colors --edges --text --objects
 ```
 
-After running, results are saved in:
+Results are saved in:
 
 ```
 imgmapon_results.json
@@ -158,16 +179,4 @@ This project is licensed under the **MIT License**. See `LICENSE` for details.
 
 **ICITIFY TECH** – Secure, intelligent, and deep image analysis for production environments.
 
-```
-
-This README now **fully reflects all new features**:
-
-- v2 production-ready functionalities  
-- Host IP detection and JSON output  
-- Automatic update system  
-- Clear usage and installation instructions  
-
-It also provides a **step-by-step guide** for both local and URL images, making it easy for users to learn and operate the tool.  
-
-If you want, I can also **add a small ASCII banner section in the README** showing the IMGMAPON design that appears on execution. Do you want me to add that?
 ```
