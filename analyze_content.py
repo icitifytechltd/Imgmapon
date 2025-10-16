@@ -82,7 +82,7 @@ def dominant_colors(input_image, k: int = 6) -> Dict[str, object]:
     small = img.copy()
     small.thumbnail((300, 300))
     arr = np.array(small).reshape(-1,
-                   3).astype(float) if np is not None else None
+                                  3).astype(float) if np is not None else None
 
     if arr is None:
         return {"error": "numpy required for dominant_colors"}
@@ -147,7 +147,7 @@ def detect_faces(input_image, save_annotated: Optional[str] = None) -> Dict[str,
     faces = face_cascade.detectMultiScale(
         gray, scaleFactor=1.1, minNeighbors=5, minSize=(24, 24))
     boxes = [{"x": int(x), "y": int(y), "w": int(w), "h": int(h)}
-                       for (x, y, w, h) in faces.tolist()]
+             for (x, y, w, h) in faces.tolist()]
 
     if save_annotated and boxes:
         draw = img.copy()
@@ -223,5 +223,20 @@ def detect_objects(image_path: str, model_dir: str, conf_threshold: float = 0.4)
 
     # Labels for MobileNetSSD
     CLASSES = [
-        "background", "aeroplane", "bicycle", "bird", "boat",
-        "b
+        "person", "bicycle", "car", "motorbike", "aeroplane", "bus", "train",
+        "truck", "boat", "traffic light", "fire hydrant", "stop sign",
+        "parking meter", "bench", "bird", "cat", "dog", "horse", "sheep",
+        "cow", "elephant", "bear", "zebra", "giraffe", "backpack", "umbrella",
+        "handbag", "tie", "suitcase", "frisbee", "skis", "snowboard",
+        "sports ball", "kite", "baseball bat", "baseball glove", "skateboard",
+        "surfboard", "tennis racket", "bottle", "wine glass", "cup", "fork",
+        "knife", "spoon", "bowl", "banana", "apple", "sandwich", "orange",
+        "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair",
+        "sofa", "potted plant", "bed", "dining table", "toilet", "tvmonitor",
+        "laptop", "mouse", "remote", "keyboard", "cell phone", "microwave",
+        "oven", "toaster", "sink", "refrigerator", "book", "clock", "vase",
+        "scissors", "teddy bear", "hair drier", "toothbrush"
+    ]
+
+
+b = "some value"
