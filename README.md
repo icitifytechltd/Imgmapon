@@ -21,7 +21,7 @@ It extracts metadata, detects objects, finds dominant colors, edges, and perform
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/ICITIFYTECH/Imgmapon.git
+git clone https://github.com/icitifytechltd/Imgmapon.git
 cd Imgmapon
 ````
 
