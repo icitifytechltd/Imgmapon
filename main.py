@@ -9,6 +9,45 @@ from utils import banner, save_json
 import requests
 from io import BytesIO
 from geopy.geocoders import Nominatim  # for reverse geolocation from GPS
+# Welcome Massage
+
+import time
+import sys
+
+
+def welcome_banner():
+    banner_lines = [
+        "██████╗ ██╗███╗   ███╗ ███╗   ███╗ █████╗ ██████╗ ███╗   ██╗",
+        "██╔══██╗██║████╗ ████║ ████╗ ████║██╔══██╗██╔═══██╗████╗  ██║",
+        "██████╔╝██║██╔████╔██║ ██╔████╔██║███████║██║   ██║██╔██╗ ██║",
+        "██╔═══╝ ██║██║╚██╔╝██║ ██║╚██╔╝██║██╔══██║██║   ██║██║╚██╗██║",
+        "██║     ██║██║ ╚═╝ ██║ ██║ ╚═╝ ██║██║  ██║╚██████╔╝██║ ╚████║",
+        "╚═╝     ╚═╝╚═╝     ╚═╝ ╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝",
+        "                   WELCOME TO IMG MAPON v2",
+        "                Advanced Image Forensics Tool",
+        "                   Created by ICITIFY TECH"
+    ]
+
+    # ANSI color codes for a gradient effect
+    colors = [
+        '\033[91m',  # Red
+        '\033[93m',  # Yellow
+        '\033[92m',  # Green
+        '\033[96m',  # Cyan
+        '\033[94m',  # Blue
+        '\033[95m',  # Magenta
+    ]
+
+    reset = '\033[0m'
+
+    for idx, line in enumerate(banner_lines):
+        color = colors[idx % len(colors)]  # cycle colors
+        for char in line:
+            print(f"{color}{char}{reset}", end="", flush=True)
+            time.sleep(0.0015)  # Typing effect speed
+        print()
+        time.sleep(0.05)  # Pause betwee
+
 
 # -------------------
 # Helper Functions
@@ -101,7 +140,7 @@ def process_image(image_path, args):
     return results
 
 # -------------------
-# Main Function
+# My Main Function
 # -------------------
 
 
@@ -152,7 +191,7 @@ def main():
     # Merge source info
     data.update(results)
 
-    # Save results
+    # Where result is save into
     save_json("imgmapon_results.json", data)
     print("\n✅ Results saved to imgmapon_results.json\n")
 
