@@ -1,7 +1,3 @@
-Got it! Here’s a **ready-to-copy `README.md` file** you can paste directly into your project:
-
----
-
 ````markdown
 # IMG MAPON
 
@@ -102,12 +98,3 @@ This will output:
 
 **ICITIFY TECH**
 Email: [info@icitifytech.com](mailto:info@icitifytech.com)
-
-```
-
----
-
-If you want, I can **also make a fully working `imgmapon_main.py` script** that exactly supports all these commands and outputs results nicely—so after pasting the README, the tool works immediately.  
-
-Do you want me to do that next?
-```
