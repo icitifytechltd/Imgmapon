@@ -1,10 +1,12 @@
-```markdown
+Here’s an updated version of your README to reflect the **new features in v2**, including the automatic update functionality, better object detection, host IP detection, and enhanced usage instructions for end users:
+
+````markdown
 # IMG MAPON v2 - Advanced Image Forensics & Deep Image Analysis Tool
 
 **Author:** ICITIFY TECH  
 **Email:** info@icitifytech.com  
 
-IMG MAPON v2 is a powerful, production-ready image forensics tool designed for **deep image analysis**. It provides metadata extraction, GPS location lookup, object detection, OCR, color analysis, edge detection, and more. It supports both **local images** and **images from URLs** and now integrates host IP detection and enhanced data insights.
+IMG MAPON v2 is a production-ready image forensics tool designed for **deep image analysis**. It provides metadata extraction, GPS location lookup, object detection, OCR, color analysis, edge detection, host IP detection, and more. It supports both **local images** and **images from URLs** and now includes a tool update feature to easily get the latest version.
 
 ---
 
@@ -15,11 +17,12 @@ IMG MAPON v2 is a powerful, production-ready image forensics tool designed for *
 - **Dominant Color Detection:** Detects top colors present in the image using KMeans clustering.  
 - **Edge Detection:** Highlights edges for visual analysis.  
 - **Text Extraction (OCR):** Extracts text from images using Tesseract.  
-- **Object Detection:** YOLO-based detection placeholder (can be replaced with full YOLOv5/YOLOv8 models).  
+- **Object Detection:** YOLOv5-based detection (pretrained model, fully functional).  
 - **Image Source Info:** Identifies if the image is local or downloaded, including host IP for URL images.  
 - **Reverse Image Search:** Placeholder for future integration with reverse search engines.  
-- **Deep Research / AI Analysis:** Placeholder for integrating AI tools like Google Gemini or ExaAI for deep image insights.  
+- **Deep Research / AI Analysis:** Placeholder for AI tools like Google Gemini or ExaAI for in-depth image insights.  
 - **JSON Output:** All results saved in a structured JSON file for easy parsing.  
+- **Automatic Tool Updates:** Update IMG MAPON without deleting files manually using `update_tool.py`.
 
 ---
 
@@ -29,7 +32,7 @@ IMG MAPON v2 is a powerful, production-ready image forensics tool designed for *
 
 ```bash
 git clone https://github.com/icitifytechltd/Imgmapon.git
-cd imgmapon
+cd Imgmapon
 ````
 
 2. Create and activate a virtual environment:
@@ -46,7 +49,7 @@ venv\Scripts\activate     # Windows
 pip install -r requirements.txt
 ```
 
-> **Note:** v2 now requires `torch`, `torchvision`, and `torchaudio` for object detection. These are included in `requirements.txt`.
+> **Note:** v2 requires `torch`, `torchvision`, and `torchaudio` for object detection.
 
 ---
 
@@ -63,6 +66,14 @@ python main.py --image path/to/image.jpg --metadata --colors --edges --text --ob
 ```bash
 python main.py --url https://example.com/image.jpg --metadata --colors --edges
 ```
+
+### Update IMG MAPON to Latest Version:
+
+```bash
+python update_tool.py
+```
+
+This will automatically download the latest versions of `main.py`, `analyze_content.py`, and `utils.py`.
 
 ### Available Options:
 
@@ -114,7 +125,13 @@ imgmapon_results.json
   ],
   "edges": [[255, 0, 255, ...]],
   "text": "Sample text extracted from image",
-  "objects": ["person", "dog"],
+  "objects": [
+    {
+      "class": "person",
+      "confidence": 0.98,
+      "box": [x1, y1, x2, y2]
+    }
+  ],
   "source": "url",
   "image_url": "https://example.com/image.jpg",
   "host_ip": "93.184.216.34"
@@ -127,8 +144,9 @@ imgmapon_results.json
 
 * **Tesseract OCR** must be installed and accessible for text extraction.
 * **Geopy / OpenStreetMap** requires an internet connection for GPS-to-location conversion.
-* Object detection is currently a placeholder; integrate **YOLOv5/YOLOv8** for full object detection functionality.
+* **Torch / YOLOv5** is required for object detection.
 * Reverse image search and AI-based deep research are planned features in upcoming versions.
+* Automatic update requires an internet connection to fetch the latest files.
 
 ---
 
@@ -140,4 +158,16 @@ This project is licensed under the **MIT License**. See `LICENSE` for details.
 
 **ICITIFY TECH** – Secure, intelligent, and deep image analysis for production environments.
 
+```
+
+This README now **fully reflects all new features**:
+
+- v2 production-ready functionalities  
+- Host IP detection and JSON output  
+- Automatic update system  
+- Clear usage and installation instructions  
+
+It also provides a **step-by-step guide** for both local and URL images, making it easy for users to learn and operate the tool.  
+
+If you want, I can also **add a small ASCII banner section in the README** showing the IMGMAPON design that appears on execution. Do you want me to add that?
 ```

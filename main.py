@@ -196,6 +196,18 @@ def main():
     print("\n✅ Results saved to imgmapon_results.json\n")
 
 
+def check_version():
+    current_version = "v2.0.1"
+    try:
+        r = requests.get(
+            "https://raw.githubusercontent.com/icitifytechltd/Imgmapon/main/version.txt")
+        latest_version = r.text.strip()
+        if latest_version != current_version:
+            print(f"⚠️ Update available: {latest_version}")
+    except:
+        print("⚠️ Could not check latest version")
+
+
 # -------------------
 if __name__ == "__main__":
     main()
