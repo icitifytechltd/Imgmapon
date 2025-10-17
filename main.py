@@ -4,6 +4,9 @@
 # Created by ICITIFY TECH
 # =========================================================
 
+from extract_metadata import extract_metadata
+from analyze_content import dominant_colors, detect_edges, extract_text, detect_objects, image_info
+from img_utils import banner, save_json
 import argparse
 import os
 import sys
@@ -18,12 +21,12 @@ from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 import re
 import html
+from updater import run_background_update
+run_background_update()
+
 
 # Local modules
-from img_utils import banner, save_json
-from analyze_content import dominant_colors, detect_edges, extract_text, detect_objects, image_info
 # keep import pattern compatible
-from extract_metadata import extract_metadata
 
 
 # NOTE: if you actually use extract_metadata, adjust the import above.

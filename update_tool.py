@@ -2,40 +2,64 @@
 import subprocess
 import os
 import sys
+import threading
 import time
 
 
-def main():
-    print("🔄 Checking for updates...")
+MAIN_APP = "main.py"  # your main application file
 
-    try:
-        # Pull latest changes if it's a Git repository
-        if os.path.exists(".git"):
+
+def background_update():
+    """Perform git and dependency updates silently, then restart main app."""
+    updated = False
+
+    # --- Git update ---
+    if os.path.exists(".git"):
+        try:
             result = subprocess.run(
                 ["git", "pull"],
-                capture_output=True, text=True
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=False
             )
-            print(result.stdout)
             if "Already up to date" not in result.stdout:
-                print("✅ Update installed successfully!")
-            else:
-                print("✅ Already up to date.")
-        else:
-            print("⚠️ Not a git repository, skipping update.")
-    except Exception as e:
-        print(f"❌ Update failed: {e}")
+                updated = True
+        except Exception:
+            pass
 
-    # optional: upgrade pip packages
+    # --- Pip dependencies update ---
     try:
         subprocess.run(
             [sys.executable, "-m", "pip", "install", "--upgrade",
-                "folium", "geopy", "requests", "torch"],
+             "folium", "geopy", "requests", "torch"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
             check=False
         )
-        print("✅ Dependencies updated successfully.")
-    except Exception as e:
-        print(f"⚠️ Could not update dependencies: {e}")
+        updated = True
+    except Exception:
+        pass
+
+    # --- Restart main application if updated ---
+    if updated and os.path.exists(MAIN_APP):
+        try:
+            subprocess.Popen([sys.executable, MAIN_APP],
+                             stdout=subprocess.DEVNULL,
+                             stderr=subprocess.DEVNULL)
+        except Exception:
+            pass
+
+
+def run_background_update():
+    """Run the updater in a non-blocking background thread."""
+    thread = threading.Thread(target=background_update, daemon=True)
+    thread.start()
 
 
 if __name__ == "__main__":
-    main()
+    run_background_update()
+
+    # --- Start your main app normally if not handled by updater ---
+    if os.path.exists(MAIN_APP):
+        subprocess.Popen([sys.executable, MAIN_APP])
