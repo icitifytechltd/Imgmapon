@@ -23,6 +23,15 @@ from geopy.extra.rate_limiter import RateLimiter
 import re
 import html
 import folium
+# Auto update check
+try:
+    from auto_update import auto_update_once_per_day
+    import sys
+    force_flag = "--update" in sys.argv or "--force-update" in sys.argv
+    auto_update_once_per_day(force=force_flag)
+except Exception as e:
+    print(f"⚠️ Auto-update skipped: {e}")
+
 
 # Optional: use free fallback IP database if APIs fail
 LOCAL_IP_LOOKUP = "https://ipwho.is/"

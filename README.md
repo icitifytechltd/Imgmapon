@@ -100,7 +100,7 @@ python main.py --url https://photos.app.goo.gl/your-photo-link --metadata --map
 ### Update Tool
 
 ```bash
-python update_tool.py
+python main.py --update
 ```
 
 ---
