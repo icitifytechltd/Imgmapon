@@ -1,18 +1,44 @@
+import time
+from geopy.geocoders import Nominatim  # for reverse geolocation from GPS
+from io import BytesIO
+import requests
+from utils import banner, save_json
+from analyze_content import dominant_colors, detect_edges, extract_text, detect_objects, image_info
 import argparse
 import os
 import json
 import socket
 from PIL import Image
 from extract_metadata import extract_metadata
-from analyze_content import dominant_colors, detect_edges, extract_text, detect_objects, image_info
-from utils import banner, save_json
-import requests
-from io import BytesIO
-from geopy.geocoders import Nominatim  # for reverse geolocation from GPS
-# Welcome Massage
-
-import time
+# === AUTO-UPDATE WITH AUTO-RESTART ===
+import subprocess
 import sys
+import os
+
+
+def auto_update_and_restart():
+    try:
+        # Run the update script silently but capture output
+        result = subprocess.run(
+            [sys.executable, "update_tool.py", "--silent"],
+            capture_output=True, text=True
+        )
+
+        # Look for success messages
+        if any(word in result.stdout for word in ["✅", "Updated", "installed", "successfully"]):
+            print("\n🔁 Update detected! Restarting IMG MAPON...\n")
+            subprocess.Popen([sys.executable, "main.py"])
+            sys.exit(0)
+
+    except Exception as e:
+        print(f"⚠️ Auto-update skipped: {e}")
+
+
+# Run update check automatically
+auto_update_and_restart()
+# === END AUTO-UPDATE ===
+
+# Welcome Massage
 
 
 def welcome_banner():
