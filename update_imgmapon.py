@@ -10,7 +10,7 @@ import pkg_resources
 # ===================================================
 # IMG MAPON Auto Updater
 # Author: ICITIFY TECH
-# Version: 2.0 (2025-10-16)
+# Version: 1.1 (2025-10-16)
 # ===================================================
 
 GITHUB_RAW_BASE = "https://raw.githubusercontent.com/icitifytechltd/Imgmapon/main/"

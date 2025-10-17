@@ -1,18 +1,4 @@
-```markdown
-# IMG MAPON v2 - Advanced Image Forensics & Deep Image Analysis Tool
 
-**Author:** ICITIFY TECH  
-**Email:** info@icitifytech.com  
-
-IMG MAPON v2 is a production-ready image forensics tool designed for **deep image analysis**. It provides metadata extraction, GPS location lookup, object detection, OCR, color analysis, edge detection, host IP detection, and more. It supports both **local images** and **images from URLs** and now includes a tool update feature to easily get the latest version.
-
----
-
-## IMGMAPON Banner
-
-When you execute `main.py`, you'll see a big welcome ASCII banner like this:
-
-```
 
 ██╗███╗   ███╗ ████╗   ████╗ ████╗   ███╗ ████╗ ██████╗ ██╗███╗   ██╗
 ██║████╗ ████║ ██╔██╗ ██╔██╗ ████║ ██╔██╗ ██╔██╗ ██╔══██╗██║████╗  ██║
@@ -21,162 +7,194 @@ When you execute `main.py`, you'll see a big welcome ASCII banner like this:
 ██║██║ ╚═╝ ██║ ██║  ╚══╝  ╚══╝██║ ██║ ██║  ╚══╝  ╚██████╔╝██║██║ ╚████║
 ╚═╝╚═╝     ╚═╝ ╚═╝         ╚═╝╚═╝ ╚═╝ ╚═╝         ╚═════╝ ╚═╝╚═╝  ╚═══╝
 
-```
-         ICITIFY TECH - IMGMAPON v2.0
-```
+---
 
-````
+````markdown
+# 🛰️ IMG MAPON v1.1  
+### Advanced Image Forensics & Deep Intelligence Tool  
 
-This makes the tool more visually appealing and gives a **professional production feel**.
+![Version](https://img.shields.io/badge/version-1.1-blue.svg)
+![Status](https://img.shields.io/badge/build-stable-brightgreen.svg)
+![License](https://img.shields.io/badge/license-MIT-yellow.svg)
+![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)
+![Made by](https://img.shields.io/badge/made%20by-ICITIFY%20TECH-purple.svg)
 
 ---
 
-## Key Features in v2
-
-- **Metadata Extraction:** EXIF info, GPS coordinates, camera model, and other image details.  
-- **GPS to Location:** Converts GPS coordinates into human-readable locations using OpenStreetMap.  
-- **Dominant Color Detection:** Detects top colors present in the image using KMeans clustering.  
-- **Edge Detection:** Highlights edges for visual analysis.  
-- **Text Extraction (OCR):** Extracts text from images using Tesseract.  
-- **Object Detection:** YOLOv5-based detection (pretrained model, fully functional).  
-- **Image Source Info:** Identifies if the image is local or downloaded, including host IP for URL images.  
-- **Reverse Image Search:** Placeholder for future integration with reverse search engines.  
-- **Deep Research / AI Analysis:** Placeholder for AI tools like Google Gemini or ExaAI for in-depth image insights.  
-- **JSON Output:** All results saved in a structured JSON file for easy parsing.  
-- **Automatic Tool Updates:** Update IMG MAPON without deleting files manually using `update_tool.py`.
+**Author:** ICITIFY TECH  
+**Email:** info@icitifytech.com  
+**License:** MIT  
+**Version:** 1.1 (Advanced Edition)
 
 ---
 
-## Installation
+## 🔍 Overview
 
-1. Clone the repository:
+**IMG MAPON v1.1** by **ICITIFY TECH** is a powerful and intelligent **image forensics tool** that extracts deep insights from digital images.  
+It analyzes **metadata**, **GPS**, **EXIF**, **objects**, **text**, and **geolocation** — then displays it all in an elegant, interactive report and HTML map.
+
+Built for:
+- 🕵️‍♂️ Digital Forensics Experts  
+- 🔒 Cybersecurity Analysts  
+- 🤖 AI Researchers  
+- 🧠 Data Intelligence Developers  
+
+---
+
+## ✨ Key Features (v1.1)
+
+| Category | Description |
+|----------|--------------|
+| 🧭 **Location Intelligence** | GPS decoding + IP geolocation + AI fallback |
+| 🧠 **Object Detection** | YOLOv5 detection with class + confidence |
+| 🔤 **Text Extraction (OCR)** | Reads visible words using Tesseract |
+| 🎨 **Visual Analytics** | Dominant colors + edge detection |
+| 🗺️ **Mapping Intelligence** | Generates HTML maps linking GPS + IP |
+| 🔁 **Auto-Updater** | `update_tool.py` keeps your tool fresh |
+| 🧩 **Modular Analysis** | Choose exactly what to analyze |
+| 📜 **JSON Export** | Full structured output for API or reporting |
+
+---
+
+## ⚡ Quick Start
+
+### 1️⃣ Clone & Setup
 
 ```bash
 git clone https://github.com/icitifytechltd/Imgmapon.git
 cd Imgmapon
+python -m venv venv
+source venv/bin/activate     # macOS / Linux
+venv\Scripts\activate        # Windows
+pip install -r requirements.txt
 ````
 
-2. Create and activate a virtual environment:
-
-```bash
-python -m venv venv
-source venv/bin/activate  # Linux / Mac
-venv\Scripts\activate     # Windows
-```
-
-3. Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-> **Note:** v2 requires `torch`, `torchvision`, and `torchaudio` for object detection.
+> Optional for AI/YOLO detection:
+>
+> ```bash
+> pip install torch torchvision torchaudio
+> ```
 
 ---
 
-## Usage
+## 🚀 Usage
 
-### Local Image Analysis:
-
-```bash
-python main.py --image path/to/image.jpg --metadata --colors --edges --text --objects
-```
-
-### Image from URL:
+### Local Image
 
 ```bash
-python main.py --url https://example.com/image.jpg --metadata --colors --edges
+python main.py --image test.jpg --metadata --colors --objects --map
 ```
 
-### Update IMG MAPON to Latest Version:
+### Online Image
+
+```bash
+python main.py --url https://example.com/image.jpg --metadata --map
+```
+
+### Google Photos Link
+
+```bash
+python main.py --url https://photos.app.goo.gl/your-photo-link --metadata --map
+```
+
+### Update Tool
 
 ```bash
 python update_tool.py
 ```
 
-This automatically updates `main.py`, `analyze_content.py`, and `utils.py`.
-
-### Available Options:
-
-| Argument     | Description                                       |
-| ------------ | ------------------------------------------------- |
-| `--image`    | Path to the local image file                      |
-| `--url`      | URL of the image                                  |
-| `--metadata` | Extract metadata (EXIF, GPS, camera model)        |
-| `--colors`   | Detect dominant colors                            |
-| `--edges`    | Perform edge detection                            |
-| `--text`     | Extract text using OCR                            |
-| `--objects`  | Detect objects in the image                       |
-| `--search`   | Perform reverse image search (coming soon)        |
-| `--research` | Conduct deep research / AI analysis (coming soon) |
-
-### Example Command:
-
-```bash
-python main.py --image test_image.jpg --metadata --colors --edges --text --objects
-```
-
-Results are saved in:
-
-```
-imgmapon_results.json
-```
-
 ---
 
-## Sample JSON Output
+## 🧠 Sample Output (JSON)
 
 ```json
 {
   "metadata": {
     "format": "JPEG",
-    "mode": "RGB",
-    "size": [1024, 768],
-    "gps": {
-      "GPSLatitude": 40.7128,
-      "GPSLongitude": -74.0060
-    },
-    "camera": "Canon EOS 80D"
+    "camera": "Samsung S22",
+    "size": [3024, 4032]
   },
-  "gps_location": "New York, NY, USA",
-  "dominant_colors": [
-    [77, 80, 84],
-    [189, 183, 183],
-    [122, 60, 52]
-  ],
-  "edges": [[255, 0, 255, ...]],
-  "text": "Sample text extracted from image",
-  "objects": [
-    {
-      "class": "person",
-      "confidence": 0.98,
-      "box": [x1, y1, x2, y2]
-    }
-  ],
-  "source": "url",
-  "image_url": "https://example.com/image.jpg",
-  "host_ip": "93.184.216.34"
+  "gps_location": {
+    "latitude": 6.5244,
+    "longitude": 3.3792,
+    "address": "Lagos, Nigeria"
+  },
+  "ip_location": {
+    "ip": "142.250.184.206",
+    "city": "Frankfurt",
+    "country": "Germany"
+  },
+  "dominant_colors": ["#2F2F2F", "#9E9E9E", "#E1E1E1"],
+  "objects": [{"name": "person", "confidence": 0.97}],
+  "text": "PRIVATE PROPERTY",
+  "source": "url"
 }
 ```
 
 ---
 
-## Notes & Requirements
+## 🧭 Command Options
 
-* **Tesseract OCR** must be installed and accessible for text extraction.
-* **Geopy / OpenStreetMap** requires an internet connection for GPS-to-location conversion.
-* **Torch / YOLOv5** is required for object detection.
-* Reverse image search and AI-based deep research are planned features in upcoming versions.
-* Automatic update requires an internet connection to fetch the latest files.
+| Argument     | Description                                      |
+| ------------ | ------------------------------------------------ |
+| `--image`    | Analyze a local image                            |
+| `--url`      | Analyze an online image (supports Google Photos) |
+| `--metadata` | Extract EXIF, GPS, and image format              |
+| `--colors`   | Detect dominant colors                           |
+| `--edges`    | Run edge detection                               |
+| `--text`     | Extract text using OCR                           |
+| `--objects`  | Run YOLOv5 detection                             |
+| `--map`      | Generate interactive HTML map                    |
+| `--search`   | Reverse image search *(coming soon)*             |
+| `--research` | Deep AI image research *(coming soon)*           |
 
 ---
 
-## License
+## 🗺️ Visual Examples (Assets Folder)
+COMING SOON...
 
-This project is licensed under the **MIT License**. See `LICENSE` for details.
+ ```
 
 ---
 
-**ICITIFY TECH** – Secure, intelligent, and deep image analysis for production environments.
+## 🧱 Build Executable (Optional)
 
+To generate a standalone version:
+
+```bash
+pyinstaller --onefile main.py
 ```
+
+✅ Output: `dist/main` (Linux/Mac) or `main.exe` (Windows)
+
+---
+
+## ⚙️ Requirements
+
+| Component      | Minimum                       |
+| -------------- | ----------------------------- |
+| Python         | 3.8+                          |
+| Tesseract      | Installed globally for OCR    |
+| Torch / YOLOv5 | Required for object detection |
+| Internet       | Needed for GPS & IP lookups   |
+
+---
+
+---
+
+## 📜 License
+
+**IMG MAPON v1.1** © 2025 **ICITIFY TECH**
+Licensed under **MIT License**
+For enterprise builds or private licensing, contact: **[info@icitifytech.com](mailto:info@icitifytech.com)**
+
+---
+
+## 💡 Credits
+
+Created & maintained by **ICITIFY TECH**
+🌍 [https://icitifytech.com](https://icitifytech.com)
+🧠 Digital Forensics | AI Security | Deep Image Analytics
+🚀 *Empowering cyber intelligence through image data.*
+
+---
