@@ -2,7 +2,7 @@ import time
 from geopy.geocoders import Nominatim  # for reverse geolocation from GPS
 from io import BytesIO
 import requests
-from utils import banner, save_json
+from img_utils import banner, save_json
 from analyze_content import dominant_colors, detect_edges, extract_text, detect_objects, image_info
 import argparse
 import os
