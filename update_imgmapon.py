@@ -7,10 +7,14 @@ import subprocess
 import sys
 import pkg_resources
 
-# GitHub repo raw URL
+# ===================================================
+# IMG MAPON Auto Updater
+# Author: ICITIFY TECH
+# Version: 2.0 (2025-10-16)
+# ===================================================
+
 GITHUB_RAW_BASE = "https://raw.githubusercontent.com/icitifytechltd/Imgmapon/main/"
 
-# List all files in the repo that should be updated
 FILES_TO_UPDATE = [
     "main.py",
     "analyze_content.py",
@@ -37,7 +41,7 @@ def get_local_version():
 
 def get_remote_version():
     try:
-        r = requests.get(GITHUB_RAW_BASE + "version.txt")
+        r = requests.get(GITHUB_RAW_BASE + "version.txt", timeout=10)
         r.raise_for_status()
         return r.text.strip()
     except Exception:
@@ -45,11 +49,9 @@ def get_remote_version():
 
 
 def backup_files(silent=False):
-    if not os.path.exists(BACKUP_FOLDER):
-        os.makedirs(BACKUP_FOLDER)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     backup_path = os.path.join(BACKUP_FOLDER, f"backup_{timestamp}")
-    os.makedirs(backup_path)
+    os.makedirs(backup_path, exist_ok=True)
 
     for file in FILES_TO_UPDATE:
         if os.path.exists(file):
@@ -62,7 +64,7 @@ def update_files(silent=False):
     for filename in FILES_TO_UPDATE:
         try:
             url = GITHUB_RAW_BASE + filename
-            r = requests.get(url)
+            r = requests.get(url, timeout=15)
             r.raise_for_status()
             with open(filename, "wb") as f:
                 f.write(r.content)
@@ -74,7 +76,6 @@ def update_files(silent=False):
 
 
 def install_dependencies(silent=False):
-    """Install or upgrade all dependencies from requirements.txt"""
     if not os.path.exists("requirements.txt"):
         if not silent:
             print("⚠️ requirements.txt not found. Skipping dependency check.")
@@ -83,7 +84,9 @@ def install_dependencies(silent=False):
         print("📦 Installing/upgrading dependencies...")
     try:
         subprocess.check_call(
-            [sys.executable, "-m", "pip", "install", "--upgrade", "-r", "requirements.txt"])
+            [sys.executable, "-m", "pip", "install",
+                "--upgrade", "-r", "requirements.txt"]
+        )
         if not silent:
             print("✅ Dependencies installed/updated successfully.")
     except subprocess.CalledProcessError as e:
@@ -92,7 +95,6 @@ def install_dependencies(silent=False):
 
 
 def check_torch_versions(silent=False):
-    """Check Torch, TorchVision, Torchaudio versions and upgrade if needed"""
     packages = {
         "torch": MIN_TORCH_VERSION,
         "torchvision": MIN_TORCHVISION_VERSION,
@@ -104,20 +106,22 @@ def check_torch_versions(silent=False):
             if pkg_resources.parse_version(installed_ver) < pkg_resources.parse_version(min_ver):
                 if not silent:
                     print(
-                        f"⚠️ {pkg} version {installed_ver} is outdated. Installing {min_ver}...")
+                        f"⚠️ {pkg} {installed_ver} outdated. Upgrading to {min_ver}...")
                 subprocess.check_call(
-                    [sys.executable, "-m", "pip", "install", f"{pkg}>={min_ver}"])
+                    [sys.executable, "-m", "pip",
+                        "install", f"{pkg}>={min_ver}"]
+                )
             elif not silent:
                 print(f"✅ {pkg} version {installed_ver} is OK")
         except pkg_resources.DistributionNotFound:
             if not silent:
-                print(f"⚠️ {pkg} is not installed. Installing {min_ver}...")
+                print(f"⚠️ {pkg} is missing. Installing {min_ver}...")
             subprocess.check_call(
-                [sys.executable, "-m", "pip", "install", f"{pkg}>={min_ver}"])
+                [sys.executable, "-m", "pip", "install", f"{pkg}>={min_ver}"]
+            )
 
 
 def restart_imgmapon():
-    """Restart IMG MAPON automatically after update."""
     print("🔄 Restarting IMG MAPON...")
     subprocess.Popen([sys.executable, "main.py"])
     print("✅ IMG MAPON restarted successfully.")
@@ -141,7 +145,7 @@ def main():
 
     if not remote_version:
         if not silent:
-            print("⚠️ Could not check for updates. Exiting.")
+            print("⚠️ Could not check for updates. Please try again later.")
         return
 
     if not silent:
@@ -151,14 +155,16 @@ def main():
     if local_version != remote_version:
         if not silent:
             print("⚡ New version detected! Backing up current files...")
-        backup_files(silent=silent)
+        backup_files(silent)
         if not silent:
             print("⚡ Updating all files...")
-        update_files(silent=silent)
-        install_dependencies(silent=silent)
-        check_torch_versions(silent=silent)
+        update_files(silent)
+        install_dependencies(silent)
+        check_torch_versions(silent)
+        with open(LOCAL_VERSION_FILE, "w") as f:
+            f.write(remote_version)
         if not silent:
-            print(f"🎉 Tool updated to version {remote_version}!")
+            print(f"🎉 IMG MAPON updated to version {remote_version}!")
         if args.auto_restart:
             restart_imgmapon()
     else:
