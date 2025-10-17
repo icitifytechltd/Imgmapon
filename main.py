@@ -145,6 +145,8 @@ def process_image(image_path, args):
 
 
 def main():
+    welcome_banner()
+    time.sleep(1)
     banner()
 
     parser = argparse.ArgumentParser(
