@@ -21,8 +21,8 @@ from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 import re
 import html
-from updater import run_background_update
-run_background_update()
+from update_tool import main
+main()
 
 
 # Local modules
