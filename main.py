@@ -19,10 +19,13 @@ from PIL import Image
 from io import BytesIO
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
+from geopy.extra.rate_limiter import RateLimiter
 import re
 import html
-from update_tool import main
-main()
+import folium
+
+# Optional: use free fallback IP database if APIs fail
+LOCAL_IP_LOOKUP = "https://ipwho.is/"
 
 
 # Local modules
@@ -284,35 +287,105 @@ def get_host_ip(url):
 
 
 def ip_to_geolocation(ip):
-    """Enhanced IP location finder with multiple fallback APIs."""
+    """Enhanced IP location finder with multiple fallback APIs.
+    Skips providers that return JSON error payloads (e.g. rate-limited).
+    Returns normalized dict or None.
+    """
     if not ip:
         return None
+
     services = [
-        f"https://ipapi.co/{ip}/json/",
         f"https://ipinfo.io/{ip}/json",
+        f"https://ipapi.co/{ip}/json/",
+        f"https://ipwho.is/{ip}",
         f"http://ip-api.com/json/{ip}"
     ]
+
     for svc in services:
         try:
             res = requests.get(svc, timeout=10)
-            res.raise_for_status()
+            # if provider returned non-JSON or non-200, skip
+            if res.status_code != 200:
+                continue
             data = res.json()
-            # normalize keys across services
-            lat = data.get("latitude") or (data.get("loc", "").split(
-                ",")[0] if data.get("loc") else None) or data.get("lat")
-            lon = data.get("longitude") or (data.get("loc", "").split(
-                ",")[1] if data.get("loc") else None) or data.get("lon")
+
+            # Many services include an 'error' field in the JSON when rate-limited / error
+            if isinstance(data, dict) and (data.get("error") or data.get("status") == "fail"):
+                # skip this provider and try next
+                continue
+
+            # Normalize common fields across providers
+            # ipapi: latitude, longitude, city, region, country_name, org
+            # ipinfo: city, region, country, loc -> "lat,lon", org
+            # ip-api: lat, lon, city, regionName, country, isp
+            lat = None
+            lon = None
+
+            # ipapi / ip-api direct keys:
+            if "latitude" in data and "longitude" in data:
+                lat = data.get("latitude")
+                lon = data.get("longitude")
+            if "lat" in data and "lon" in data:
+                lat = data.get("lat")
+                lon = data.get("lon")
+
+            # ipinfo.loc is "lat,lon"
+            if not lat and data.get("loc"):
+                try:
+                    lat_str, lon_str = str(data.get("loc")).split(",")
+                    lat = lat_str.strip()
+                    lon = lon_str.strip()
+                except Exception:
+                    pass
+
+            # convert to floats when possible
+            try:
+                lat = float(lat) if lat is not None else None
+            except Exception:
+                lat = None
+            try:
+                lon = float(lon) if lon is not None else None
+            except Exception:
+                lon = None
+
+            city = data.get("city") or data.get(
+                "regionName") or data.get("region")
+            region = data.get("region") or data.get("regionName")
+            country = data.get("country_name") or data.get("country")
+            org = data.get("org") or data.get("isp")
+
             return {
                 "ip": ip,
-                "city": data.get("city") or data.get("regionName"),
-                "region": data.get("region") or data.get("regionName"),
-                "country": data.get("country_name") or data.get("country"),
+                "city": city,
+                "region": region,
+                "country": country,
                 "latitude": lat,
                 "longitude": lon,
-                "org": data.get("org") or data.get("isp")
+                "org": org
             }
+
         except Exception:
+            # network / JSON parse / other errors: try next provider
             continue
+            # Last fallback: ipwho.is
+    try:
+        res = requests.get(f"https://ipwho.is/{ip}", timeout=10)
+        if res.status_code == 200:
+            data = res.json()
+            if data.get("success"):
+                return {
+                    "ip": ip,
+                    "city": data.get("city"),
+                    "region": data.get("region"),
+                    "country": data.get("country"),
+                    "latitude": data.get("latitude"),
+                    "longitude": data.get("longitude"),
+                    "org": data.get("connection", {}).get("org")
+                }
+    except Exception:
+        pass
+
+    # If all providers failed
     return None
 
 
@@ -328,49 +401,50 @@ def convert_to_degrees(value):
 
 
 def gps_to_location(gps_data):
-    """Smart reverse GPS lookup with retries and fallback geocoders."""
     if not gps_data or "GPSLatitude" not in gps_data or "GPSLongitude" not in gps_data:
         return None
     try:
         lat = convert_to_degrees(gps_data["GPSLatitude"])
         lon = convert_to_degrees(gps_data["GPSLongitude"])
+        if lat is None or lon is None:
+            return None
         if gps_data.get("GPSLatitudeRef") == "S":
             lat = -lat
         if gps_data.get("GPSLongitudeRef") == "W":
             lon = -lon
-        # primary geolocator
         geolocator = Nominatim(user_agent="imgmapon_locator", timeout=10)
-        for attempt in range(3):
+        reverse = RateLimiter(geolocator.reverse, min_delay_seconds=1)
+        location = reverse((lat, lon), language="en")
+
+        for _ in range(3):
             try:
                 location = geolocator.reverse((lat, lon), language="en")
+                if location and hasattr(location, 'raw'):
+                    address = location.raw.get("address", {})
+                    city = address.get("city") or address.get("town") or address.get(
+                        "village") or address.get("state_district")
+                    country = address.get("country", "Unknown")
+                    return {
+                        "latitude": float(lat),
+                        "longitude": float(lon),
+                        "address": location.address,
+                        "country": country,
+                        "city": city
+                    }
+
                 if location:
                     return {
-                        "latitude": lat,
-                        "longitude": lon,
+                        "latitude": float(lat),
+                        "longitude": float(lon),
                         "address": location.address,
                         "country": location.raw.get("address", {}).get("country", "Unknown"),
-                        "city": location.raw.get("address", {}).get("city", "Unknown")
+                        "city": location.raw.get("address", {}).get("city", None)
                     }
             except Exception:
                 time.sleep(1)
-        # fallback: geocode.xyz
-        try:
-            resp = requests.get(
-                f"https://geocode.xyz/{lat},{lon}?json=1", timeout=10)
-            if resp.status_code == 200:
-                data = resp.json()
-                return {
-                    "latitude": lat,
-                    "longitude": lon,
-                    "address": data.get("staddress", "Unknown"),
-                    "country": data.get("country", "Unknown"),
-                    "city": data.get("city", "Unknown")
-                }
-        except Exception:
-            pass
-        return {"latitude": lat, "longitude": lon, "address": "Not found"}
+        return {"latitude": float(lat), "longitude": float(lon), "address": "Not found"}
     except Exception as e:
-        return {"error": f"GPS decoding failed: {e}"}
+        return None
 
 
 # =========================================================
@@ -390,31 +464,48 @@ def generate_map(data, map_filename=MAP_FILENAME):
         print("⚠️ folium not installed. To enable map generation, run: pip install folium")
         return None
 
+    # Smart decision: EXIF GPS is authoritative (if present).
     gps_info = data.get("gps_location")
-    ip_info = data.get("ip_location")
+    ip_loc = data.get("ip_location")
 
-    if not gps_info and not ip_info:
-        return None
+    if gps_info:
+        print("\n🗺️ Photo GPS Location (from EXIF):")
+        print(f"   📍 {gps_info.get('address', 'N/A')}")
+        print(
+            f"   🌍 Lat/Lon: {gps_info.get('latitude')}, {gps_info.get('longitude')}")
+        print(
+            f"   🏙️ City: {gps_info.get('city')} | Country: {gps_info.get('country')}")
+    else:
+        print("\n🗺️ Photo GPS Location: None found in EXIF.")
+
+    # Show IP host info but clarify it's the host's location (may be CDN / not uploader)
+    if ip_loc:
+        print(
+            "\n💻 Image Origin Server/IP Location (host/CDN — may NOT be capture location):")
+        print(f"   🌐 IP: {ip_loc.get('ip')} ({ip_loc.get('org', 'Unknown')})")
+        print(
+            f"   🏙️ {ip_loc.get('city') or 'Unknown'} | {ip_loc.get('region') or ''} | {ip_loc.get('country') or ''}")
+        print(
+            f"   📍 Lat/Lon: {ip_loc.get('latitude')}, {ip_loc.get('longitude')}")
+    else:
+        print("\n💻 IP-based Location: Not available or rate-limited.")
 
     coords = []
-    if gps_info and isinstance(gps_info, dict) and gps_info.get("latitude") and gps_info.get("longitude"):
-        try:
-            coords.append(
-                (float(gps_info["latitude"]), float(gps_info["longitude"])))
-        except Exception:
-            pass
-    if ip_info and ip_info.get("latitude") and ip_info.get("longitude"):
-        try:
-            coords.append(
-                (float(ip_info["latitude"]), float(ip_info["longitude"])))
-        except Exception:
-            pass
+
+    if gps_info and gps_info.get("latitude") and gps_info.get("longitude"):
+        coords.append((float(gps_info["latitude"]),
+                      float(gps_info["longitude"])))
+
+    if ip_loc and ip_loc.get("latitude") and ip_loc.get("longitude"):
+        coords.append((float(ip_loc["latitude"]), float(ip_loc["longitude"])))
 
     if not coords:
+        print("⚠️ No valid coordinates found for map.")
         return None
 
     avg_lat = sum(c[0] for c in coords) / len(coords)
     avg_lon = sum(c[1] for c in coords) / len(coords)
+
     m = folium.Map(location=[avg_lat, avg_lon],
                    zoom_start=5, control_scale=True)
 
@@ -428,11 +519,11 @@ def generate_map(data, map_filename=MAP_FILENAME):
             icon=folium.Icon(color="blue", icon="camera")
         ).add_to(m)
 
-    if ip_info and ip_info.get("latitude") and ip_info.get("longitude"):
+    if ip_loc and ip_loc.get("latitude") and ip_loc.get("longitude"):
         folium.Marker(
-            location=[float(ip_info["latitude"]), float(ip_info["longitude"])],
+            location=[float(ip_loc["latitude"]), float(ip_loc["longitude"])],
             popup=folium.Popup(
-                f"Server/IP location:<br>{ip_info.get('ip')}<br>{ip_info.get('org', '')}", max_width=400),
+                f"Server/IP location:<br>{ip_loc.get('ip')}<br>{ip_loc.get('org', '')}", max_width=400),
             tooltip="Image host/server location",
             icon=folium.Icon(color="red", icon="cloud")
         ).add_to(m)
@@ -550,10 +641,18 @@ def main():
 
     data = process_image(image_path, args)
     data.update(results)
+    # Only use IP location if GPS is missing
+    if data.get("gps_location") and data["gps_location"].get("latitude"):
+        print("✅ Using GPS location from EXIF as primary source.")
+    else:
+        print("⚠️ No GPS in image; using IP-based location as fallback.")
 
     # Always include IP-based location (even if GPS exists)
     ip_info = ip_to_geolocation(ip)
-    if ip_info:
+    if ip_info is None:
+        # helpful debug if you saw a provider error earlier
+        print("⚠️ IP geolocation failed (rate-limited or no provider succeeded). Using IP as best-effort only.")
+    else:
         data["ip_location"] = ip_info
 
     # Save JSON results
