@@ -23,6 +23,7 @@ from geopy.extra.rate_limiter import RateLimiter
 import re
 import html
 import folium
+import requests
 # Auto update check
 try:
     from auto_update import auto_update_once_per_day
@@ -33,13 +34,39 @@ except Exception as e:
     print(f"⚠️ Auto-update skipped: {e}")
 
 
-# Optional: use free fallback IP database if APIs fail
-LOCAL_IP_LOOKUP = "https://ipwho.is/"
+def get_public_ip_info(timeout=5):
+    """Try multiple free IP lookup APIs (no API key needed)."""
+    IP_LOOKUP_APIS = [
+        "https://ipwho.is/",
+        "http://ip-api.com/json/",
+        "https://ipapi.co/json/",
+        "https://ipinfo.io/json",
+        "https://freeipapi.com/api/json",
+        "https://freegeoip.app/json/",
+        "https://ifconfig.me/all.json",
+        "https://ip.nf/me.json",
+        "https://ip.seeip.org/jsonip?",
+        "https://api.ipify.org?format=json"
+    ]
+
+    for api in IP_LOOKUP_APIS:
+        try:
+            res = requests.get(api, timeout=timeout)
+            if res.status_code == 200:
+                data = res.json()
+                # Extract IP field safely
+                ip = data.get("ip") or data.get("query") or data.get(
+                    "ip_address") or data.get("remote_addr")
+                if ip:
+                    data["resolved_from"] = api
+                    return data
+        except Exception:
+            continue
+    return {"error": "All IP lookup services failed."}
 
 
 # Local modules
 # keep import pattern compatible
-
 
 # NOTE: if you actually use extract_metadata, adjust the import above.
 # Map filename
@@ -52,7 +79,7 @@ MAP_FILENAME = "imgmapon_map.html"
 def auto_update_and_restart():
     try:
         result = subprocess.run(
-            [sys.executable, "update_tool.py", "--silent"],
+            [sys.executable, "auto_update.py", "--silent"],
             capture_output=True, text=True
         )
         if any(word in result.stdout for word in ["✅", "Updated", "installed", "successfully"]):
@@ -633,10 +660,9 @@ def main():
             return
         results = {"source": "local", "image_path": image_path}
         # local machine IP for origin (best-effort)
-        try:
-            ip = requests.get("https://ipapi.co/ip/", timeout=5).text.strip()
-        except Exception:
-            ip = None
+        ip_data = get_public_ip_info()
+        ip = ip_data.get("ip") if isinstance(ip_data, dict) else None
+
     elif args.url:
         image_path = download_image(args.url)
         if not image_path:
